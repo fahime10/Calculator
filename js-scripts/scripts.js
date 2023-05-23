@@ -5,6 +5,8 @@ let operator = "";
 const currentDisplayedNumber = document.querySelector(".current-number");
 const previousDisplayedNumber = document.querySelector(".previous-number");
 
+window.addEventListener("keydown", handleKeyPress);
+
 const equal = document.querySelector(".equal");
 equal.addEventListener("click", () => {
     if (currentNum != "" && previousNum != "") {
@@ -118,5 +120,49 @@ function addDecimal() {
     if (!currentNum.includes(".")) {
         currentNum += ".";
         currentDisplayedNumber.textContent = currentNum;
+    }
+}
+
+function handleKeyPress(e) {
+    e.preventDefault();
+    if (e.key >= 0 && e.key <= 9) {
+        handleNumber(e.key);
+    }
+
+    if (e.key === "Enter" || 
+        (e.key === "" && currentNum != "" && previousNum != "")
+        ) {
+        calculate();
+    }
+
+    if (e.key === "+" || e.key === "-" || e.key === "/") {
+        handleOperator(e.key);
+    }
+
+    if (e.key === "*") {
+        handleOperator("x");
+    }
+
+    if (e.key === ".") {
+        addDecimal();
+    }
+
+    if (e.key === "Backspace") {
+        handleDelete();
+    }
+}
+
+function handleDelete() {
+    if (currentNum != "") {
+        currentNum = currentNum.slice(0, -1);
+        currentDisplayedNumber.textContent = currentNum;
+        if (currentNum === "") {
+            currentDisplayedNumber.textContent = "0";
+        }
+    }
+
+    if (currentNum === "" && previousNum !== "" && operator === "") {
+        previousNum = previousNum.slice(0, -1);
+        currentDisplayedNumber.textContent = previousNum;
     }
 }
