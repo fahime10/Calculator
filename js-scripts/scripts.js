@@ -6,11 +6,19 @@ const currentDisplayedNumber = document.querySelector(".current-number");
 const previousDisplayedNumber = document.querySelector(".previous-number");
 
 const equal = document.querySelector(".equal");
-equal.addEventListener("click", calculate);
+equal.addEventListener("click", () => {
+    if (currentNum != "" && previousNum != "") {
+        calculate();
+    }
+});
 
 const decimal = document.querySelector(".decimal");
+decimal.addEventListener("click", () => {
+    addDecimal();
+});
 
 const clear = document.querySelector(".clear");
+clear.addEventListener("click", clearCalculator);
 
 const numberButtons = document.querySelectorAll(".number");
 
@@ -23,6 +31,10 @@ numberButtons.forEach(btn => {
 });
 
 function handleNumber(number) {
+    if (previousNum !== "" && currentNum !== "" && operator === "") {
+        previousNum = "";
+        currentDisplayedNumber.textContent = currentNum;
+    }
     if (currentNum.length <= 11) {
         currentNum += number;
         currentDisplayedNumber.textContent = currentNum;
@@ -36,11 +48,24 @@ operators.forEach((btn) => {
 });
 
 function handleOperator(op) {
-    operator = op;
-    previousNum = currentNum;
-    previousDisplayedNumber.textContent = previousNum + " " + operator;
+    if (previousNum === "") {
+        previousNum = currentNum;
+        operatorCheck(op);
+    } else if (currentNum === "") {
+        operatorCheck(op);
+    } else {
+        calculate();
+        operator = op;
+        currentDisplayedNumber.textContent = "0";
+        previousDisplayedNumber.textContent = previousNum + " " + operator; 
+    }
+}
+
+function operatorCheck(text) {
+    operator = text;
+    previousDisplayedNumber.textContent = previousNum + " " + operator; 
+    currentDisplayedNumber.textContent = "0";
     currentNum = "";
-    currentDisplayedNumber.textContent = "";
 }
 
 function calculate() {
@@ -61,16 +86,37 @@ function calculate() {
         }
         previousNum = previousNum / currentNum;
     }
+    previousNum = roundNumber(previousNum);
     previousNum = previousNum.toString();
     displayResult();
 }
 
+function roundNumber(num) {
+    return Math.round(num * 100000) / 100000;
+}
+
 function displayResult() {
-    previousDisplayedNumber.textContent = "";
-    operator = "";
-    if (previousDisplayedNumber.length <= 11) {
+    if (previousNum.length <= 11) {
         currentDisplayedNumber.textContent = previousNum;
     } else {
         currentDisplayedNumber.textContent = previousNum.slice(0, 11) + "...";
+    }
+    previousDisplayedNumber.textContent = "";
+    operator = "";
+    currentNum = "";
+}
+
+function clearCalculator() {
+    currentNum = "";
+    previousNum = "";
+    operator = "";
+    currentDisplayedNumber.textContent = "0";
+    previousDisplayedNumber.textContent = ""; 
+}
+
+function addDecimal() {
+    if (!currentNum.includes(".")) {
+        currentNum += ".";
+        currentDisplayedNumber.textContent = currentNum;
     }
 }
